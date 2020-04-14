@@ -1,11 +1,14 @@
 from multiprocessing import Pool, freeze_support
 import sys
-
+import random
+import os
 
 numcore = int(sys.argv[1])
 
+word = list("mmliiggfeeeeedddatttsssrrrrnmma")
+random.shuffle(word)
+word = "".join(word)
 
-word = ""
 return_filename = word + ".csv"
 dictionary_file = "words_alpha.txt"
 dictionary = open(dictionary_file)
@@ -44,11 +47,16 @@ def find_words_length_contain(dictionary, template, leng):
         if len(line) != leng:
             continue
         if investigate_letter(line, letter_dict):
+            if line + ".csv" in os.listdir():
+                continue
             word_list.append(line)
     return word_list
 
 
 def for_multicore(el):
+    return_filename = el + ".csv"
+    if return_filename in os.listdir():
+        return 1
     residue = find_residue(el, word)
     residue_word_list = find_words_length_contain(dictionary, residue, 4)
     for sub_el in residue_word_list:
@@ -64,8 +72,6 @@ if __name__ == "__main__":
     freeze_support()
     pool = Pool(numcore)
     length = 12
-    file = open(return_filename, 'w')
-    file.close()
     words = find_words_length_contain(dictionary, word, length)
     count = 1
     for result in pool.imap_unordered(for_multicore, (n for n in words)):
