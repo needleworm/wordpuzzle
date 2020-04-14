@@ -20,16 +20,23 @@ for letter in word:
         continue
     letter_dict[letter] = word.count(letter)
 
+
+def investigate(word):
+    for letter in word:
+        if letter not in letter_dict:
+            return False
+        if line.count(letter) > letter_dict[letter]:
+            return False
+    return True
+
+
 for line in dictionary:
     line = line.strip()
     if len(line) != length:
         continue
-    for letter in line:
-        if letter not in letter_dict:
-            continue
-        if line.count(letter) != letter_dict[letter]:
-            continue
-    file = open(return_filename, 'a')
-    file.write(line + "\n\n")
-    file.close()
-    word_list.append(line)
+
+    if investigate(line):
+        file = open(return_filename, 'a')
+        file.write(line + "\n\n")
+        file.close()
+        word_list.append(line)
