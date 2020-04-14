@@ -30,6 +30,6 @@ for line in dictionary:
         if line.count(letter) != letter_dict[letter]:
             continue
     file = open(return_filename, 'a')
-    file.write(line)
+    file.write(line + "\n\n")
     file.close()
     word_list.append(line)
