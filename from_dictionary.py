@@ -4,7 +4,8 @@ import sys
 
 numcore = int(sys.argv[1])
 
-word = 'tttaadddeeeeefggiilmmmmnrrrrsss'
+
+word = ""
 return_filename = word + ".csv"
 dictionary_file = "words_alpha.txt"
 dictionary = open(dictionary_file)
@@ -47,17 +48,16 @@ def find_words_length_contain(dictionary, template, leng):
     return word_list
 
 
-def for_multicore(word_list_len_12):
-    for el in word_list_len_12:
-        residue = find_residue(el, word)
-        residue_word_list = find_words_length_contain(dictionary, residue, 4)
-        for sub_el in residue_word_list:
-            sub_residue = find_residue(sub_el, residue)
-            sub_residue_word_list = find_words_length_contain(dictionary, sub_residue, 4)
-            for sub_sub_el in sub_residue_word_list:
-                file = open(return_filename, 'a')
-                file.write(sub_el + ", " + el + ", " + sub_sub_el + "\n")
-                file.close()
+def for_multicore(el):
+    residue = find_residue(el, word)
+    residue_word_list = find_words_length_contain(dictionary, residue, 4)
+    for sub_el in residue_word_list:
+        sub_residue = find_residue(sub_el, residue)
+        sub_residue_word_list = find_words_length_contain(dictionary, sub_residue, 4)
+        for sub_sub_el in sub_residue_word_list:
+            file = open(return_filename, 'a')
+            file.write(sub_el + ", " + el + ", " + sub_sub_el + "\n")
+            file.close()
     return 1
 
 if __name__ == "__main__":
@@ -67,6 +67,7 @@ if __name__ == "__main__":
     file = open(return_filename, 'w')
     file.close()
     words = find_words_length_contain(dictionary, word, length)
-    
+    count = 1
     for result in pool.imap_unordered(for_multicore, (n for n in words)):
-        pass
+        print(count)
+        count += 1
