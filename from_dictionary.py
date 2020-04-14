@@ -1,14 +1,13 @@
-word = 'aadddeeeeefggiilmmmmnrrrrsssttt'
-length = 12
+from multiprocessing import Pool, freeze_support
+import sys
+
+
+numcore = int(sys.argv[1])
+
+word = 'tttaadddeeeeefggiilmmmmnrrrrsss'
+return_filename = word + ".csv"
 dictionary_file = "words_alpha.txt"
-
-
 dictionary = open(dictionary_file)
-
-return_filename = word + ".txt"
-file = open(return_filename, 'w')
-file.close()
-
 
 def letter_to_dictionary(template):
     letter_dict = {}
@@ -48,20 +47,26 @@ def find_words_length_contain(dictionary, template, leng):
     return word_list
 
 
-len_12_words = find_words_length_contain(dictionary, word, length)
-return_pairs = []
-for el in len_12_words:
-    residue = find_residue(el, word)
-    residue_word_list = find_words_length_contain(dictionary, residue, 4)
-    for sub_el in residue_word_list:
-        sub_residue = find_residue(sub_el, residue)
-        sub_residue_word_list = find_words_length_contain(dictionary, sub_residue, 4)
-        for sub_sub_el in sub_residue_word_list:
-            pairs = (sub_el, el, sub_sub_el)
-            if pairs in return_pairs:
-                continue
-            return_pairs.append(pairs)
-            file = open(return_filename, 'a')
-            file.write(sub_el + "\t" + el + "\t" + sub_sub_el + "\n\n")
-            file.close()
+def for_multicore(word_list_len_12):
+    for el in word_list_len_12:
+        residue = find_residue(el, word)
+        residue_word_list = find_words_length_contain(dictionary, residue, 4)
+        for sub_el in residue_word_list:
+            sub_residue = find_residue(sub_el, residue)
+            sub_residue_word_list = find_words_length_contain(dictionary, sub_residue, 4)
+            for sub_sub_el in sub_residue_word_list:
+                file = open(return_filename, 'a')
+                file.write(sub_el + ", " + el + ", " + sub_sub_el + "\n")
+                file.close()
+    return 1
 
+if __name__ == "__main__":
+    freeze_support()
+    pool = Pool(numcore)
+    length = 12
+    file = open(return_filename, 'w')
+    file.close()
+    words = find_words_length_contain(dictionary, word, length)
+    
+    for result in pool.imap_unordered(for_multicore, (n for n in words)):
+        pass
