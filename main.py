@@ -1,17 +1,37 @@
-from PyDictionary import PyDictionary
 from itertools import permutations, combinations
 import sys
 from multiprocessing import Pool, freeze_support
 
-pd = PyDictionary()
 
 word = sys.argv[1]
 length = int(sys.argv[2])
 numcore = int(sys.argv[3])
+mode = sys.argv[4]
+
+if mode == 'pydictionary':
+    from PyDictionary import PyDictionary
+    pd = PyDictionary()
 
 filename = word + ".txt"
 success_word_list = []
 failure_word_list = []
+
+dictionary = []
+
+def search_save_for_multiprocessing_local_dict(string):
+    querry = "".join(string)
+    if querry in success_word_list:
+        return "failure"
+    elif querry in failure_word_list:
+        return "faulure"
+    if querry in dictionary:
+        success_word_list.append(querry)
+        file = open(filename, 'a')
+        file.write(querry + "\n" + str(search_result) + "\n\n")
+        file.close()
+        return querry
+    else:
+        failure_word_list.append(querry)
 
 
 def search_save_for_multiprocessing(string):
@@ -197,21 +217,44 @@ def quiz_once(word, lenth):
 
 
 if __name__ == '__main__':
-    if numcore > 1:
-        freeze_support()
-        pool = Pool(numcore)
-        file = open(filename, "w")
-        file.close()
-        permut = permutations(word, length)
-        count = 1
-        for result in pool.imap(search_save_for_multiprocessing, permut):
-            print(count)
-            count += 1
-    else:
-        if length > 1:
-            search_and_save(word, length)
-
-        elif length == 1:
-            find_2_words(word)
+    if mode == 'pydictionary':
+        if numcore > 1:
+            freeze_support()
+            pool = Pool(numcore)
+            file = open(filename, "w")
+            file.close()
+            permut = permutations(word, length)
+            count = 1
+            for result in pool.imap(search_save_for_multiprocessing, permut):
+                print(count)
+                count += 1
         else:
-            search_and_save_for_last_one(word)
+            if length > 1:
+                search_and_save(word, length)
+
+            elif length == 1:
+                find_2_words(word)
+            else:
+                search_and_save_for_last_one(word)
+    else:
+        file = open(mode)
+        dictionary = file.read().split("\n")
+        file.close()
+        if numcore > 1:
+            freeze_support()
+            pool = Pool(numcore)
+            file = open(filename, "w")
+            file.close()
+            permut = permutations(word, length)
+            count = 1
+            for result in pool.imap_unordered(search_save_for_multiprocessing_local_dict, permut):
+                print(count)
+                count += 1
+        else:
+            if length > 1:
+                search_and_save(word, length)
+
+            elif length == 1:
+                find_2_words(word)
+            else:
+                search_and_save_for_last_one(word)
