@@ -11,7 +11,7 @@ word_list = []
 
 letter_dict = {}
 
-return_filename = open(word + ".txt")
+return_filename = word + ".txt"
 file = open(return_filename, 'w')
 file.close()
 
@@ -33,4 +33,3 @@ for line in dictionary:
     file.write(line)
     file.close()
     word_list.append(line)
-
