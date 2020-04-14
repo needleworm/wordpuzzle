@@ -27,7 +27,7 @@ def search_save_for_multiprocessing_local_dict(string):
     if querry in dictionary:
         success_word_list.append(querry)
         file = open(filename, 'a')
-        file.write(querry + "\n" + str(search_result) + "\n\n")
+        file.write(querry  + "\n\n")
         file.close()
         return querry
     else:
