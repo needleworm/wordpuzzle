@@ -24,3 +24,8 @@ Required
 
 Run
 >python main.py {word} {permutation number} {core number} pydictionary
+
+
+## Rebuild from Dictionary
+Run
+>python from_dictionary.py {word} {permutationi number} {dictionary_file}
