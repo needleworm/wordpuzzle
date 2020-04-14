@@ -238,7 +238,10 @@ if __name__ == '__main__':
                 search_and_save_for_last_one(word)
     else:
         file = open(mode)
-        dictionary = file.read().split("\n")
+        dictionary = []
+        for line in file:
+            if len(line.strip()) == length:
+                dictionary.append(line)
         file.close()
         if numcore > 1:
             freeze_support()
