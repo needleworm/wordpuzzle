@@ -23,7 +23,7 @@ def refine_a_file(filename):
             a, b, c = line.strip().split(", ")
         except:
             continue
-        if a in keyword or c in ban_list:
+        if a in BAN or c in BAN:
             continue
         else:
             newfile.write(line)
