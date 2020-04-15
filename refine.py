@@ -26,7 +26,7 @@ def refine_a_file(filename):
         if a in BAN or c in BAN:
             continue
         else:
-            newfile.write(line)
+            newfile.write(line + "\n")
 
     newfile.close()
     return True
