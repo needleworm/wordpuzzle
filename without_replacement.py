@@ -20,40 +20,43 @@ def read_and_refine_words(dictionary_filename):
     return res
 
 
-dictionary = read_and_refine_words(dictionary_filename)
+
+def check_template(el, template):
+    if not template:
+        return False, ""
+    if el not in template:
+        return False, ""
+    return True, template[template.index(el) + 1:]
 
 
 def investigate_words(wd, template):
+    if len(wd) != length:
+        return False
     for el in wd:
         if not template:
             return False
-        while len(template) > 0:
-            if template[0] != el:
-                template = template[1:]
-                continue
-            else:
-                template = template[1:]
-                break
+        check_result, residue = check_template(el, template)
+        if not check_result:
+            return False
+        template = residue
     return True
 
 
 def find_words_length_contain(elem):
     elem = elem.strip()
-    if len(elem) != length:
-        return ""
     if investigate_words(elem, word):
+        if elem == "id":
+            print(1221)
         return elem + "\n"
 
 
 if __name__ == "__main__":
     freeze_support()
     pool = Pool(numcore)
-    count = 1
+    dictionary = read_and_refine_words(dictionary_filename)
     res_file = open(word + ".txt", 'w')
     for result in pool.imap_unordered(find_words_length_contain, (n for n in dictionary)):
         if result:
             res_file.write(result)
-        print(count)
-        count += 1
     print("Job Finished")
     res_file.close()
