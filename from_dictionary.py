@@ -1,18 +1,13 @@
 from multiprocessing import Pool, freeze_support
 import sys
-import random
-import os
+from PyDictionary import PyDictionary
 
-numcore = int(sys.argv[1])
-
-word = list("mmliiggfeeeeedddatttsssrrrrnmma")
-random.shuffle(word)
-word = "".join(word)
+word = sys.argv[1]
+length = int(sys.argv[2])
+numcore = int(sys.argv[3])
 
 return_filename = word + ".csv"
-dictionary_file = "samples.txt"
-dictionary = open(dictionary_file)
-dict_4 = open("len4_refined.txt")
+
 
 def letter_to_dictionary(template):
     letter_dict = {}
@@ -32,54 +27,40 @@ def find_residue(string, template):
     return "".join(template)
 
 
-def investigate_letter(line, dictionary):
+def investigate_letter(line, word):
+    if len(line) != length:
+        return False
+    worddict = letter_to_dictionary(word)
     for letter in line:
-        if letter == '-':
-            continue
-        if letter not in dictionary:
+        if letter not in worddict:
             return False
-        elif line.count(letter) > dictionary[letter]:
+        elif line.count(letter) > worddict[letter]:
             return False
-    return True
+    return word
 
 
-def find_words_length_contain(dictionary, template, leng):
-    word_list = []
-    dictionary.seek(0)
-    letter_dict = letter_to_dictionary(template)
-    for line in dictionary:
-        line = line.strip()
-        if len(line) != leng:
-            continue
-        if investigate_letter(line, letter_dict):
-            if line + ".csv" in os.listdir():
-                continue
-            word_list.append(line)
-    return word_list
+def write_in(word, file, result):
+    file.write(word)
+    keys = result.keys()
+    for key in keys:
+        file.write("\t" + key + "\n")
+        for meanings in result[key]:
+            file.write("\t\t" + meanings + "\n\n")
 
-
-def for_multicore(el):
-    return_filename = el + ".csv"
-    if return_filename in os.listdir():
-        return 1
-    residue = find_residue(el, word)
-    residue_word_list = find_words_length_contain(dict_4, residue, 4)
-    for sub_el in residue_word_list:
-        file = open(return_filename, 'a')
-        file.write(el + ", " + sub_el +  "\n")
-        file.close()
-    return 1
 
 if __name__ == "__main__":
     freeze_support()
     pool = Pool(numcore)
-    length = 13
-    words = find_words_length_contain(dictionary, word, length)
-    count = 1
-    for result in pool.imap_unordered(for_multicore, (n for n in words)):
-        print(count)
-        count += 1
+    pd = PyDictionary()
+
+    file = open(word + ".txt", 'w')
+
+    DICTIONARY = []
+    dictionary_file = open("words_alpha.txt")
+    for line in pool.imap_unordered(investigate_letter, dictionary_file):
+        if line:
+            DICTIONARY.append(line)
+            write_in(word, file, pd.meaning(line))
+
     print("Job Finished")
-    dictionary.close()
-    dict_4.close()
-    
+    file.close()
