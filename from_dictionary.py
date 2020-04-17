@@ -27,7 +27,8 @@ def find_residue(string, template):
     return "".join(template)
 
 
-def investigate_letter(line, word):
+def investigate_letter(line):
+    line = line.strip()
     if len(line) != length:
         return False
     worddict = letter_to_dictionary(word)
@@ -36,11 +37,13 @@ def investigate_letter(line, word):
             return False
         elif line.count(letter) > worddict[letter]:
             return False
-    return word
+    return line
 
 
-def write_in(word, file, result):
-    file.write(word)
+def write_in(line, file, result):
+    if not result:
+        return
+    file.write(line)
     keys = result.keys()
     for key in keys:
         file.write("\t" + key + "\n")
@@ -59,8 +62,9 @@ if __name__ == "__main__":
     dictionary_file = open("words_alpha.txt")
     for line in pool.imap_unordered(investigate_letter, dictionary_file):
         if line:
+            print(line)
             DICTIONARY.append(line)
-            write_in(word, file, pd.meaning(line))
+            write_in(line, file, pd.meaning(line))
 
     print("Job Finished")
     file.close()
